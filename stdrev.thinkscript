@@ -1,0 +1,50 @@
+def OPEN_ACTUAL_TIME = 0930;
+def CLOSE_ACTUAL_TIME = 1600;
+def is_trading_hours = If((SecondsFromTime(OPEN_ACTUAL_TIME) >= 0 && SecondsTillTime(CLOSE_ACTUAL_TIME) > 0), 1, 0);
+
+def stoploss = close < close[-10] * 0.95;
+
+def rsi = RSI("average type" = "EXPONENTIAL");
+
+input price = close;
+input deviations = 1.1;
+input short_gap = 0.3;
+input fullRange = no;
+input length = 1024;
+input spread = 0.0001;
+input overshoot = 0.2;
+input tradesize = 1;
+input only_when_open = no;
+
+def regression;
+def stdDeviation;
+if (fullRange) {
+    regression = InertiaAll(price);
+    stdDeviation = StDevAll(price);
+} else {
+    regression = InertiaAll(price, length);
+    stdDeviation = StDevAll(price, length);
+}
+
+plot upper = regression + deviations * stdDeviation;
+plot breaker = regression + overshoot * stdDeviation;
+plot middle = regression;
+plot lower = regression - deviations * stdDeviation;
+
+plot upper_s = regression + (deviations + short_gap) * stdDeviation;
+plot breaker_s = regression - overshoot * stdDeviation;
+plot middle_s = regression;
+plot lower_s = regression - (deviations + short_gap) * stdDeviation;
+
+upper.SetDefaultColor(GetColor(8));
+middle.SetDefaultColor(GetColor(8));
+lower.SetDefaultColor(GetColor(8));
+
+
+AddOrder(OrderType.BUY_TO_OPEN, (price crosses above lower - spread) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
+
+AddOrder(OrderType.SELL_TO_OPEN, (price crosses below upper_s + spread) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
+
+AddOrder(OrderType.SELL_TO_CLOSE, (price crosses above breaker) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
+
+AddOrder(OrderType.BUY_TO_CLOSE, (price crosses below breaker_s) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
