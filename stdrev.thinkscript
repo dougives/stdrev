@@ -9,7 +9,7 @@ def rsi = RSI("average type" = "EXPONENTIAL");
 input price = close;
 input deviations = 1.1;
 input short_gap = 0.3;
-input fullRange = no;
+input full_range = no;
 input length = 1024;
 input spread = 0.0001;
 input overshoot = 0.2;
@@ -17,24 +17,24 @@ input tradesize = 1;
 input only_when_open = no;
 
 def regression;
-def stdDeviation;
-if (fullRange) {
+def std_deviation;
+if (full_range) {
     regression = InertiaAll(price);
-    stdDeviation = StDevAll(price);
+    std_deviation = StDevAll(price);
 } else {
     regression = InertiaAll(price, length);
-    stdDeviation = StDevAll(price, length);
+    std_deviation = StDevAll(price, length);
 }
 
-plot upper = regression + deviations * stdDeviation;
-plot breaker = regression + overshoot * stdDeviation;
+plot upper = regression + deviations * std_deviation;
+plot breaker = regression + overshoot * std_deviation;
 plot middle = regression;
-plot lower = regression - deviations * stdDeviation;
+plot lower = regression - deviations * std_deviation;
 
-plot upper_s = regression + (deviations + short_gap) * stdDeviation;
-plot breaker_s = regression - overshoot * stdDeviation;
+plot upper_s = regression + (deviations + short_gap) * std_deviation;
+plot breaker_s = regression - overshoot * std_deviation;
 plot middle_s = regression;
-plot lower_s = regression - (deviations + short_gap) * stdDeviation;
+plot lower_s = regression - (deviations + short_gap) * std_deviation;
 
 upper.SetDefaultColor(GetColor(8));
 middle.SetDefaultColor(GetColor(8));
