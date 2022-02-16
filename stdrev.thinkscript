@@ -36,15 +36,25 @@ plot breaker_s = regression - overshoot * std_deviation;
 plot middle_s = regression;
 plot lower_s = regression - (deviations + short_gap) * std_deviation;
 
+upper.Hide();
+breaker.Hide();
+middle.Hide();
+lower.Hide();
+
+upper_s.Hide();
+breaker_s.Hide();
+middle_s.Hide();
+lower_s.Hide();
+
 upper.SetDefaultColor(GetColor(8));
 middle.SetDefaultColor(GetColor(8));
 lower.SetDefaultColor(GetColor(8));
 
 
-AddOrder(OrderType.BUY_TO_OPEN, (price crosses above lower - spread) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
+AddOrder(OrderType.BUY_TO_OPEN, (price crosses above lower - spread) and (is_trading_hours is true or only_when_open is false), close[-1], 1,tickcolor = Color.YELLOW, arrowcolor = Color.YELLOW, name = "BTO");
 
-AddOrder(OrderType.SELL_TO_OPEN, (price crosses below upper_s + spread) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
+AddOrder(OrderType.SELL_TO_OPEN, (price crosses below upper_s + spread) and (is_trading_hours is true or only_when_open is false), close[-1],tickcolor = Color.YELLOW, arrowcolor = Color.YELLOW, name = "STC");
 
-AddOrder(OrderType.SELL_TO_CLOSE, (price crosses above breaker) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
+AddOrder(OrderType.SELL_TO_CLOSE, (price crosses above breaker) and (is_trading_hours is true or only_when_open is false), close[-1], 1, tickcolor = Color.CYAN, arrowcolor = Color.CYAN, name = "STC");
 
-AddOrder(OrderType.BUY_TO_CLOSE, (price crosses below breaker_s) and (is_trading_hours or not only_when_open), tradeSize = tradesize);
+AddOrder(OrderType.BUY_TO_CLOSE, (price crosses below breaker_s) and (is_trading_hours is true or only_when_open is false), close[-1], 1, tickcolor = Color.CYAN, arrowcolor = Color.CYAN, name = "BTC");
